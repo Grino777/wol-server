@@ -1,0 +1,452 @@
+openapi: 3.0.3
+info:
+  title: WOL Server API
+  description: |
+    HTTP API для управления серверами Wake-on-LAN.
+    Все маршруты защищены Basic Auth.
+  version: 1.0.0
+servers:
+  - url: /api/v1
+    description: Базовый путь API v1
+tags:
+  - name: Servers
+    description: Операции с серверами
+  - name: Users
+    description: Операции с пользователями
+  - name: Actions
+    description: Действия включения и выключения
+paths:
+  /servers:
+    get:
+      tags: [Servers]
+      summary: Получить список серверов
+      description: Возвращает массив серверов из хранилища.
+      security:
+        - basicAuth: []
+      responses:
+        "200":
+          description: Список серверов успешно получен
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Server"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "413":
+          description: Тело запроса превышает допустимый лимит
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: "#/components/schemas/MiddlewareErrorResponse"
+                  - $ref: "#/components/schemas/ErrorMessage"
+              examples:
+                middlewareLimit:
+                  summary: Ограничение сработало в middleware
+                  value:
+                    error: request body too large
+                decodeLimit:
+                  summary: Ограничение сработало при декодировании JSON
+                  value:
+                    code: bad_request
+                    message: 
+                      http: request body too large
+        "500":
+          description: Внутренняя ошибка сервера
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: "internal error\n"
+    post:
+      tags: [Servers]
+      summary: Создать сервер
+      description: Создает новую запись сервера.
+      security:
+        - basicAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Server"
+      responses:
+        "200":
+          description: Сервер успешно создан
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SuccessfulResponse"
+        "400":
+          description: Некорректные данные запроса
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessage"
+              examples:
+                invalidJson:
+                  summary: Невалидный JSON
+                  value:
+                    code: bad_request
+                    message: invalid character '}' looking for beginning of object key string
+                alreadyExists:
+                  summary: Сервер уже существует
+                  value:
+                    code: already exists
+                    message: already exists
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "413":
+          $ref: "#/components/responses/RequestEntityTooLarge"
+        "415":
+          description: Неподдерживаемый Content-Type
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorMessage"
+              example:
+                code: bad_request
+                message: content type is not application/json
+        "500":
+          description: Внутренняя ошибка сервера
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: "internal error\n"
+  /servers/{id}:
+    get:
+      tags: [Servers]
+      summary: Получить сервер по ID
+      description: |
+        Эндпоинт зарегистрирован, но пока не реализован.
+      security:
+        - basicAuth: []
+      parameters:
+        - $ref: "#/components/parameters/ServerIdRaw"
+      responses:
+        "501":
+          $ref: "#/components/responses/NotImplemented"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "413":
+          $ref: "#/components/responses/RequestEntityTooLarge"
+    patch:
+      tags: [Servers]
+      summary: Обновить сервер
+      description: |
+        Эндпоинт зарегистрирован, но пока не реализован.
+      security:
+        - basicAuth: []
+      parameters:
+        - $ref: "#/components/parameters/ServerIdRaw"
+      responses:
+        "501":
+          $ref: "#/components/responses/NotImplemented"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "413":
+          $ref: "#/components/responses/RequestEntityTooLarge"
+    delete:
+      tags: [Servers]
+      summary: Удалить сервер
+      description: |
+        Эндпоинт зарегистрирован, но пока не реализован.
+      security:
+        - basicAuth: []
+      parameters:
+        - $ref: "#/components/parameters/ServerIdRaw"
+      responses:
+        "501":
+          $ref: "#/components/responses/NotImplemented"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "413":
+          $ref: "#/components/responses/RequestEntityTooLarge"
+  /users:
+    get:
+      tags: [Users]
+      summary: Получить список пользователей
+      description: |
+        Эндпоинт зарегистрирован, но пока не реализован.
+      security:
+        - basicAuth: []
+      responses:
+        "501":
+          $ref: "#/components/responses/NotImplemented"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "413":
+          $ref: "#/components/responses/RequestEntityTooLarge"
+  /users/{id}:
+    get:
+      tags: [Users]
+      summary: Получить пользователя по ID
+      description: |
+        Эндпоинт зарегистрирован, но пока не реализован.
+      security:
+        - basicAuth: []
+      parameters:
+        - $ref: "#/components/parameters/UserId"
+      responses:
+        "501":
+          $ref: "#/components/responses/NotImplemented"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "413":
+          $ref: "#/components/responses/RequestEntityTooLarge"
+    post:
+      tags: [Users]
+      summary: Создать пользователя
+      description: |
+        Эндпоинт зарегистрирован как `POST /users/{id}`, но пока не реализован.
+      security:
+        - basicAuth: []
+      parameters:
+        - $ref: "#/components/parameters/UserId"
+      responses:
+        "501":
+          $ref: "#/components/responses/NotImplemented"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "413":
+          $ref: "#/components/responses/RequestEntityTooLarge"
+    patch:
+      tags: [Users]
+      summary: Обновить пользователя
+      description: |
+        Эндпоинт зарегистрирован, но пока не реализован.
+      security:
+        - basicAuth: []
+      parameters:
+        - $ref: "#/components/parameters/UserId"
+      responses:
+        "501":
+          $ref: "#/components/responses/NotImplemented"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "413":
+          $ref: "#/components/responses/RequestEntityTooLarge"
+    delete:
+      tags: [Users]
+      summary: Удалить пользователя
+      description: |
+        Эндпоинт зарегистрирован, но пока не реализован.
+      security:
+        - basicAuth: []
+      parameters:
+        - $ref: "#/components/parameters/UserId"
+      responses:
+        "501":
+          $ref: "#/components/responses/NotImplemented"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "413":
+          $ref: "#/components/responses/RequestEntityTooLarge"
+  /wake/{id}:
+    post:
+      tags: [Actions]
+      summary: Отправить WOL-команду включения
+      description: |
+        Пытается инициировать включение сервера по идентификатору.
+      security:
+        - basicAuth: []
+      parameters:
+        - $ref: "#/components/parameters/ServerId"
+      responses:
+        "204":
+          description: Команда отправлена
+        "400":
+          description: Некорректный идентификатор
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: "invalid id\n"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "413":
+          $ref: "#/components/responses/RequestEntityTooLarge"
+        "500":
+          description: Ошибка выполнения действия
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+              example:
+                code: internal_error
+                message: internal error
+  /off/{id}:
+    post:
+      tags: [Actions]
+      summary: Отправить команду выключения
+      description: |
+        Пытается инициировать выключение сервера по идентификатору.
+      security:
+        - basicAuth: []
+      parameters:
+        - $ref: "#/components/parameters/ServerId"
+      responses:
+        "204":
+          description: Команда отправлена
+        "400":
+          description: Некорректный идентификатор
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: "invalid id\n"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "413":
+          $ref: "#/components/responses/RequestEntityTooLarge"
+        "500":
+          description: Ошибка выполнения действия
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+              example:
+                code: internal_error
+                message: internal error
+components:
+  securitySchemes:
+    basicAuth:
+      type: http
+      scheme: basic
+      description: Basic-аутентификация, обязательна для всех маршрутов.
+  parameters:
+    ServerId:
+      name: id
+      in: path
+      required: true
+      description: Числовой идентификатор сервера
+      schema:
+        type: integer
+    ServerIdRaw:
+      name: id
+      in: path
+      required: true
+      description: Идентификатор сервера (пока не валидируется хендлером)
+      schema:
+        type: string
+    UserId:
+      name: id
+      in: path
+      required: true
+      description: Идентификатор пользователя
+      schema:
+        type: string
+  responses:
+    Unauthorized:
+      description: Ошибка авторизации
+      headers:
+        WWW-Authenticate:
+          description: Заголовок Basic-аутентификации
+          schema:
+            type: string
+            example: Basic realm="restricted", charset="UTF-8"
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/MiddlewareErrorResponse"
+          example:
+            error: unauthorized
+    RequestEntityTooLarge:
+      description: Тело запроса превышает допустимый лимит
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/MiddlewareErrorResponse"
+          example:
+            error: request body too large
+    NotImplemented:
+      description: Эндпоинт еще не реализован
+      content:
+        text/plain:
+          schema:
+            type: string
+            example: "not implemented\n"
+  schemas:
+    Server:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: uint64
+          description: Идентификатор сервера
+          example: 1
+        name:
+          type: string
+          description: Название сервера
+          example: Home PC
+        mac_address:
+          type: string
+          description: MAC-адрес
+          example: AA:BB:CC:DD:EE:FF
+        ip_address:
+          type: string
+          description: IP-адрес
+          example: 192.168.0.10
+        port:
+          type: integer
+          format: uint64
+          description: Порт управления
+          example: 9
+        created_at:
+          type: string
+          format: date-time
+          description: Дата создания записи
+          example: "2026-03-16T08:00:00Z"
+        updated_at:
+          type: string
+          format: date-time
+          description: Дата последнего обновления
+          example: "2026-03-16T08:00:00Z"
+      required:
+        - name
+        - mac_address
+        - ip_address
+        - port
+    SuccessfulResponse:
+      type: object
+      properties:
+        status:
+          type: string
+          example: ok
+      required:
+        - status
+    ErrorMessage:
+      type: object
+      properties:
+        code:
+          type: string
+          example: bad_request
+        message:
+          type: string
+          example: content type is not application/json
+      required:
+        - code
+        - message
+    ErrorResponse:
+      type: object
+      properties:
+        code:
+          type: string
+          example: internal_error
+        message:
+          type: string
+          example: internal error
+      required:
+        - code
+        - message
+    MiddlewareErrorResponse:
+      type: object
+      properties:
+        error:
+          type: string
+          example: unauthorized
+      required:
+        - error
